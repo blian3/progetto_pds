@@ -52,29 +52,36 @@ namespace MouseKeyboardLibrary
 
         public string getRelativePath(string pathname, string clipBoardEntry)
         {
-            if (isDir)
-            {
-                if (pathname.Equals(clipBoardEntry))
-                    return (new DirectoryInfo(clipBoardEntry)).Name; // + "\\"
-                else // sottocartella
-                {
-                    //string nomeCartellaClipboardEntry = (new DirectoryInfo(clipBoardEntry)).Name;
-                    //string pathRelativo = pathname.Replace(clipBoardEntry, "");
-                    //string pathRelativoConCartellaClipboardEntry = nomeCartellaClipboardEntry + pathRelativo;
-                    return (new DirectoryInfo(clipBoardEntry)).Name + pathname.Replace(clipBoardEntry, "");
-                }
-            }
-            else
-            {
-                if (pathname.Equals(clipBoardEntry))
-                    return Path.GetFileName(pathname);
-                else // file nella sottocartella
-                {
-                    //string nomeCartellaClipboardEntry = (new DirectoryInfo(clipBoardEntry)).Name;
-                    //string pathRelativo = pathname.Replace(clipBoardEntry, "");
-                    return (new DirectoryInfo(clipBoardEntry)).Name + pathname.Replace(clipBoardEntry, "");
-                }
-            }
+            if (!pathname.Equals(clipBoardEntry))   // se sottocartella o file in sottocartella
+                return (new DirectoryInfo(clipBoardEntry)).Name + pathname.Replace(clipBoardEntry, "");
+            else if(isDir)      // entry nella clipboard è una cartella
+                return (new DirectoryInfo(clipBoardEntry)).Name;
+            else                // entry nella clipboard è un file
+                return Path.GetFileName(pathname);
+
+            //if (isDir)
+            //{
+            //    if (pathname.Equals(clipBoardEntry))
+            //        return (new DirectoryInfo(clipBoardEntry)).Name; // + "\\"
+            //    else // sottocartella
+            //    {
+            //        //string nomeCartellaClipboardEntry = (new DirectoryInfo(clipBoardEntry)).Name;
+            //        //string pathRelativo = pathname.Replace(clipBoardEntry, "");
+            //        //string pathRelativoConCartellaClipboardEntry = nomeCartellaClipboardEntry + pathRelativo;
+            //        return (new DirectoryInfo(clipBoardEntry)).Name + pathname.Replace(clipBoardEntry, "");
+            //    }
+            //}
+            //else
+            //{
+            //    if (pathname.Equals(clipBoardEntry))
+            //        return Path.GetFileName(pathname);
+            //    else // file nella sottocartella
+            //    {
+            //        //string nomeCartellaClipboardEntry = (new DirectoryInfo(clipBoardEntry)).Name;
+            //        //string pathRelativo = pathname.Replace(clipBoardEntry, "");
+            //        return (new DirectoryInfo(clipBoardEntry)).Name + pathname.Replace(clipBoardEntry, "");
+            //    }
+            //}
         }
 
     }
@@ -107,8 +114,9 @@ namespace MouseKeyboardLibrary
                     cbContent = new ClipboardContent(ClipboardContentType.FILEDROPLIST, ObjectToByteArray(cbEntriesToSend));
                     cbContent.Files = GetFiles(Clipboard.GetFileDropList());
                 }
-                //else
-                // gestire caso generico?
+                else // caso generico
+                    cbContent = new ClipboardContent(ClipboardContentType.DATA, ObjectToByteArray(Clipboard.GetDataObject()));
+                
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -137,6 +145,13 @@ namespace MouseKeyboardLibrary
                         ByteToFile(cc.Files);
                         Clipboard.SetFileDropList(paths);
                         return;
+                    case ClipboardContentType.DATA:
+                        IDataObject dataObject = (IDataObject)ByteArrayToObject(cc.Content);
+                        DataObject cbData = new DataObject();
+                        foreach (string format in dataObject.GetFormats())
+                            cbData.SetData(format, false, dataObject.GetData(format, false));
+                        Clipboard.SetDataObject(cbData, true);
+                        return;
                 }
             });
             thread.SetApartmentState(ApartmentState.STA);
@@ -148,10 +163,8 @@ namespace MouseKeyboardLibrary
         {
             StringCollection ret = new StringCollection();
             foreach (string s in sc)
-            {
-                //ret.Add(Path.GetTempPath() + "\\" + Path.GetFileName(s));
                 ret.Add(Path.GetTempPath() + "\\" + s);
-            }
+
             return ret;
         }
 
@@ -214,284 +227,3 @@ namespace MouseKeyboardLibrary
         }
     }
 }
-
-
-
-
-
-
-////private static Dictionary<string, Object> dataObjects = new Dictionary<string, Object>();
-//private static byte[] data;
-
-
-
-//public static byte[] getClipboardSerialized() {
-//    Thread t = new Thread(() =>
-//    {
-//        //Serializable structure
-//        Dictionary<string, Object> dataObjects = new Dictionary<string, Object>();
-
-//        //Clipboard aux structure
-//        IDataObject clipboardData = Clipboard.GetDataObject();
-
-//    #region normalEntryClipboard
-
-//    //Entries format of clipboard
-//    string[] list_format = clipboardData.GetFormats();
-//    Console.WriteLine("\n\n[CLIPBOARD] CountFormats: {0}", list_format.Length);
-//    int index = 0;
-
-//    //Each entry in Clipboard is inserted into dictionary dataObject
-//    Console.WriteLine("GET CLIPBOARD ##################");
-//    foreach (string format in list_format)
-//    {
-//        object clipboardItem = clipboardData.GetData(format);
-//        if (clipboardItem != null && clipboardItem.GetType().IsSerializable)
-//        {
-//            Console.WriteLine("#{0}\tFormat: {1}\t\t\t\tContent:{2}", index, format, clipboardItem.ToString());
-//            index++;
-//            dataObjects.Add(format, clipboardItem);
-//        }
-//        if (clipboardItem == null)
-//            Console.WriteLine("null {0}", format);
-//        else if (!clipboardItem.GetType().IsSerializable)
-//            Console.WriteLine("not serializable {0}\t\t{1}", format, clipboardItem.ToString());
-//    }
-
-//    #endregion
-
-//    #region fileEntryClipboard
-
-//    //Veriry presence of file
-//    System.Collections.Specialized.StringCollection returnList = null;
-//    if (Clipboard.ContainsFileDropList())
-//    {
-//        returnList = Clipboard.GetFileDropList();
-//    }
-
-
-//    try
-//    {
-
-//        if (returnList != null)
-//        {
-//            //structure to send in FILETRANSFER enrty
-//            List<byte[]> list_file = new List<byte[]>();
-
-//            //Ci sono uno o più file da trasferire
-//            foreach (string filePath in returnList)
-//            {
-//                //allocate byte array
-//                byte[] bytes_file;
-
-//                ////get filename
-//                //string fileName = Path.GetFileName(filePath);
-//                //Console.WriteLine("Filename sended: "+fileName);
-
-//                using (FileStream fs_file = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite))
-//                {
-
-//                    //TODO : grandezza buffer. 
-//                    byte[] bytes = new byte[32768];
-
-//                    //readSafe 
-//                    using (MemoryStream ms = new MemoryStream())
-//                    {
-//                        while (true)
-//                        {
-//                            int read = fs_file.Read(bytes, 0, bytes.Length);
-//                            if (read <= 0)
-//                                break;
-//                            ms.Write(bytes, 0, read);
-//                        }
-//                        bytes_file = ms.ToArray();
-//                    }
-//                }
-//                //add to list file
-//                list_file.Add(bytes_file);
-//                Console.WriteLine("ADDED NEW FILE TO FILETRANSFER: size: " + bytes_file.Length);
-//            }
-
-
-//            //Byte array into dictionary dataObject
-//            dataObjects.Add("FILETRANSFER", list_file);
-
-//        }
-//    }
-//    catch (Exception e)
-//    {
-//        Console.WriteLine("EXCPETION WHILE READING FILESTREAM");
-//    }
-//        #endregion
-
-//    #region imageClipboard
-//    Image img = null;
-//    if (Clipboard.ContainsImage())
-//    {
-//        img = Clipboard.GetImage();
-//    }
-
-//    if (img != null)
-//    {
-//        dataObjects.Add("IMAGETRANSFER", img);
-//        Console.WriteLine("img added to dataobjectes");
-//    }
-//    #endregion
-
-
-//    #region serializeDataObjects
-//    try
-//    {
-//        using (MemoryStream ms = new MemoryStream())
-//        {
-//            if (dataObjects.ContainsKey("FILETRANSFER"))
-//                Console.WriteLine("#[CLIPBOOOOOOOOOARD] mbare ");
-
-//            //serialize dictionary in byte[]
-//            bf.Serialize(ms, dataObjects);
-//            data = ms.ToArray();
-//        }
-//    }
-//    catch (SerializationException)
-//    {
-//        Console.WriteLine("Error during serialization Dictionary dataObjects");
-//    }
-//    #endregion
-
-
-
-
-
-
-
-//    });
-//    t.SetApartmentState(ApartmentState.STA);
-//    t.Start();
-//    t.Join();
-
-//    return data;
-//}
-
-
-
-//public static void setClipboardSerialized(byte[] data){
-//    Thread t = new Thread(() => {
-
-//        #region DeserializeClipboard
-//        Dictionary<string, Object> dataObjects = new Dictionary<string, Object>();
-//        using (MemoryStream ms = new MemoryStream(data))
-//            dataObjects = bf.Deserialize(ms) as Dictionary<string, Object>;
-
-//        #endregion
-
-//        #region normalEntryClipboard
-//        DataObject clipboardData = new DataObject();
-//        int index = 0;
-
-//        Console.WriteLine("SET CLIPBOARD ##################");
-//        //Retrieve all format and all value in dictionary
-//        foreach (string key in dataObjects.Keys)
-//        {
-//            if (!key.Equals("FILETRANSFER"))
-//            {
-//                clipboardData.SetData(key, dataObjects[key]);
-//                Console.WriteLine("#{0}\tFormat: {1}\t\t\t\tContent:{2}", index, key, dataObjects[key].ToString());
-//                index++;
-//            }
-//        }
-
-//        #endregion
-
-//        //Clipboard Restored
-//        //Clipboard.SetDataObject(clipboardData);
-
-//        #region fileEntryClipboard
-//        //Wait a moment. Is there file in there?
-//        System.Collections.Specialized.StringCollection returnList = null;
-
-//        if (Clipboard.ContainsFileDropList())
-//        {
-//            Console.WriteLine("Clipboard contais file drop list");
-//            List<byte[]> list_file = new List<byte[]>();
-//            string desktop_path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-//            returnList = Clipboard.GetFileDropList();
-
-//            if (dataObjects.ContainsKey("FILETRANSFER"))
-//            {
-//                list_file = (List<byte[]>)dataObjects["FILETRANSFER"];
-//            }
-
-//            StringCollection sc = new StringCollection();
-//            if (list_file.Count == returnList.Count)
-//            {
-//                foreach (byte[] file in list_file)
-//                {
-//                    string s = desktop_path + "\\" + Path.GetFileName(returnList[list_file.IndexOf(file)]);
-//                    sc.Add(s);
-//                    using (FileStream fs = new FileStream(s, FileMode.Create, FileAccess.ReadWrite))
-//                    {
-//                        fs.Write(file, 0, file.Length);
-//                        Console.WriteLine("Received size file #{0} in clipboard: {1} \t{2}", list_file.IndexOf(file), file.Length, s);
-//                    }
-
-//                }
-
-//            }
-//            else
-//            {
-//                Console.WriteLine("Problemiiiiiii: list_file.Count != returnList.Count {0}!={1}", list_file.Count, returnList.Count);
-//            }
-
-//            Clipboard.SetFileDropList(sc);
-
-//        }
-//        #endregion
-
-//        if (dataObjects.ContainsKey("IMAGETRANSFER"))
-//        {
-//            Image img1 = dataObjects["IMAGETRANSFER"] as Image;
-
-//            Clipboard.SetImage(img1);
-//        }
-
-
-
-//        //Serializable structure
-//        Dictionary<string, Object> dataObjects2 = new Dictionary<string, Object>();
-
-//        //Clipboard aux structure
-//        IDataObject clipboardData2 = Clipboard.GetDataObject();
-
-
-//        //Entries format of clipboard
-//        string[] list_format2 = clipboardData2.GetFormats();
-//        Console.WriteLine("\n\n[CLIPBOARD] CountFormats: {0}", list_format2.Length);
-//        int index2 = 0;
-
-//        //Each entry in Clipboard is inserted into dictionary dataObject
-//        Console.WriteLine("GET CLIPBOARD DOPO SET  ##################");
-//        foreach (string format in list_format2)
-//        {
-//            object clipboardItem = clipboardData2.GetData(format);
-//            if (clipboardItem != null && clipboardItem.GetType().IsSerializable)
-//            {
-//                Console.WriteLine("#{0}\tFormat: {1}\t\t\t\tContent:{2}", index2, format, clipboardItem.ToString());
-//                index2++;
-//                dataObjects2.Add(format, clipboardItem);
-//            }
-//            if (clipboardItem == null)
-//                Console.WriteLine("null {0}", format);
-//            else if (!clipboardItem.GetType().IsSerializable)
-//                Console.WriteLine("not serializable {0}\t\t{1}", format, clipboardItem.ToString());
-//        }
-
-
-//    });
-
-//    t.SetApartmentState(ApartmentState.STA);
-//    t.Start();
-//    t.Join();
-//}
-//    }
-//}
