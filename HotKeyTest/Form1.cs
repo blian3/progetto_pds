@@ -26,11 +26,24 @@ namespace HotKeyTest
             kbHook.KeyDown += hkListener.KeyDownListen;
             kbHook.KeyUp += hkListener.KeyUpListen;
 
-            hkRecorder.HotKeyRecordedEvent += (HotKey hk) =>
+            //hkRecorder.HotKeyRecordedEvent += (HotKey hk) =>
+            //{
+            //    hk.HotKeyHappened += hk_HotKeyEvent;
+            //    hkListener.Add(hk);
+            //    label1.Text += "HotKeyRegistered: " + hk.ToString() + "\n";
+            //};
+            hkRecorder.HotKeyRecorded += (object sender, HotKeyRecordedArgs e) =>
             {
-                hk.HotKeyHappened += hk_HotKeyEvent;
-                hkListener.Add(hk);
-                label1.Text += "HotKeyRegistered: " + hk.ToString() + "\n";
+                e.hotKey.HotKeyHappened += hk_HotKeyEvent;
+                if(hkListener.Add(e.hotKey))
+                    label1.Text += "HotKeyRegistered: " + e.hotKey.ToString() + "\n";
+                else
+                    label1.Text += e.hotKey.ToString() + " can't be registered\n";
+            };
+
+            hkRecorder.KeyRecorded += (object sender, HotKeyRecordedArgs e) =>
+            {
+                label2.Text = "Recording: " + e.hotKey.ToString();
             };
         }
 
@@ -42,9 +55,6 @@ namespace HotKeyTest
         private void button1_Click(object sender, EventArgs e)
         {
             hkRecorder.Rec();
-            //Task.Factory.StartNew(() => {
-            //    label1.Text = "HotKey: " + hkRecorder.Rec().ToString();
-            //});
         }
 
         private void button2_Click(object sender, EventArgs e)

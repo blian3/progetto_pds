@@ -11,7 +11,6 @@ namespace MouseKeyboardLibrary
 
     #region HotKey
 
-    [Serializable]
     public class HotKey
     {
         private List<Keys> sequence;
@@ -89,7 +88,7 @@ namespace MouseKeyboardLibrary
                 case "ADD": return "NUMPAD+";
                 case "DECIMAL": return "NUMPAD.";
             }
-            return ret;            
+            return ret;
         }
 
         public override string ToString()
@@ -110,15 +109,16 @@ namespace MouseKeyboardLibrary
                 if (indexToCheck == sequence.Count)
                 {
                     indexToCheck = 0;
-                    OnHotKeyHappened(EventArgs.Empty);                  
+                    OnHotKeyHappened(EventArgs.Empty);
                 }
             }
             else
                 indexToCheck = 0;
         }
 
-        public void OnHotKeyHappened(EventArgs e) {
-            if(HotKeyHappened!=null)
+        public void OnHotKeyHappened(EventArgs e)
+        {
+            if (HotKeyHappened != null)
                 HotKeyHappened(this, e);
         }
 
@@ -186,7 +186,7 @@ namespace MouseKeyboardLibrary
 
         public bool Equals(HotKey hk)
         {
-            if (hk == null || Size() != hk.Size()) 
+            if (hk == null || Size() != hk.Size())
                 return false;
 
             for (int i = 0; i < Size(); ++i)
@@ -206,12 +206,14 @@ namespace MouseKeyboardLibrary
 
     #endregion
 
-    public delegate void HotKeyRecordedHandler(HotKey hk);
+    #region HotKeyRecorder
 
-    //public class HotKeyRecordedArgs : EventArgs
-    //{
-    //    public HotKey hotKey;
-    //}
+    public class HotKeyRecordedArgs : EventArgs
+    {
+        public HotKey hotKey;
+    }
+
+    //public delegate string KeyRecorded();
 
     public class HotKeyRecorder
     {
@@ -219,10 +221,10 @@ namespace MouseKeyboardLibrary
         private ClientKeyboardHook kbHook;
         private List<KeyEventArgs> buffer;
         private bool _recording;
-        public event HotKeyRecordedHandler HotKeyRecordedEvent;
-        //public event EventHandler<HotKeyRecordedArgs> HotKeyRecorded;
+        public event EventHandler<HotKeyRecordedArgs> HotKeyRecorded, KeyRecorded;
+        //public event EventHandler< KeyRecorded;
 
-        public bool Recording { get { return _recording; } }
+        public bool Recording { get { return _recording; } private set { _recording = value; } }
 
         public HotKeyRecorder()
         {
@@ -246,34 +248,45 @@ namespace MouseKeyboardLibrary
             kbHook.Stop();
         }
 
-        private void KeyDownHandler(object sender, KeyEventArgs e) {
+        private void KeyDownHandler(object sender, KeyEventArgs e)
+        {
             if (_recording && (buffer.Count == 0 || !HotKey.ParseKey(e.KeyCode).Equals(HotKey.ParseKey(buffer[buffer.Count - 1].KeyCode))))
-                    buffer.Add(e);
+            {
+                buffer.Add(e);
+                OnKeyRecorded(new HotKeyRecordedArgs() { hotKey = new HotKey(buffer) });
+            }
         }
 
         private void KeyUpHandler(object sender, KeyEventArgs e)
         {
-            if (_recording && buffer.Count >= minKeys && HotKeyRecordedEvent != null)
-                HotKeyRecordedEvent(new HotKey(buffer));
-            //if (_recording && buffer.Count >= minKeys)
-            //{
-            //    HotKeyRecordedArgs args = new HotKeyRecordedArgs();
-            //    args.hotKey = new HotKey(buffer);
-            //}
+            if (_recording && buffer.Count >= minKeys)  // gestire duplicazione hotkey?
+                OnHotKeyRecorded(new HotKeyRecordedArgs() { hotKey = new HotKey(buffer) });
             buffer = new List<KeyEventArgs>();
         }
 
-        //protected void OnHotKeyRecorded(HotKeyRecordedArgs e)
-        //{
-        //    if (HotKeyRecorded != null)
-        //    {
-        //        HotKeyRecorded(this, e);
-        //    }
-        //}
+        protected void OnHotKeyRecorded(HotKeyRecordedArgs e)
+        {
+            if (HotKeyRecorded != null)
+            {
+                HotKeyRecorded(this, e);
+            }
+        }
+        protected void OnKeyRecorded(HotKeyRecordedArgs e)
+        {
+            if (KeyRecorded != null)
+            {
+                KeyRecorded(this, e);
+            }
+        }
 
     }
 
-    public class HotKeyListener {
+    #endregion
+
+    #region HotKeyListener
+
+    public class HotKeyListener
+    {
         private List<HotKey> hotKeys;
 
         public HotKeyListener()
@@ -285,9 +298,13 @@ namespace MouseKeyboardLibrary
             this.hotKeys = hotKeys;
         }
 
-        public void Add(HotKey hk)
+        public bool Add(HotKey hk)  // gestire duplicazione hotkey?
         {
+            foreach (HotKey hkTmp in hotKeys)
+                if (hk.HasSameKeysSequence(hkTmp))
+                    return false;
             hotKeys.Add(hk);
+            return true;
         }
 
         public bool Remove(HotKey hk)
@@ -307,4 +324,7 @@ namespace MouseKeyboardLibrary
                 hk.ResetCheckCounter();
         }
     }
+
+    #endregion
+
 }
