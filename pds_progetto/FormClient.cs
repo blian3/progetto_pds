@@ -12,7 +12,7 @@ using System.IO;
 
 namespace pds_progetto
 {
-    public partial class Form1 : Form
+    public partial class FormClient : Form
     {
         //CONFIGURATION
         static Server_farm Server_farm = new Server_farm();
@@ -27,7 +27,7 @@ namespace pds_progetto
         private ClientKeyboardHook keyboardHook = new ClientKeyboardHook();     // associa degli handler degli eventi keyboard, senza eseguire la CallNextHookEx
         private HotKeyListener hkListener = new HotKeyListener();       // ascolta se viene premuto una combinazione di tasti e ne esegue l'handler
 
-        public Form1()
+        public FormClient()
         {
             InitializeComponent();
 

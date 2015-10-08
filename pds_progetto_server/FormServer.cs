@@ -15,7 +15,7 @@ namespace pds_progetto_server
         ClientActive
     }
 
-    public partial class Form1 : Form
+    public partial class FormServer : Form
     {
         private ServerSocket ss = new ServerSocket();
         volatile ServerStatus status;
@@ -23,7 +23,7 @@ namespace pds_progetto_server
         private ServerKeyboardHook serverKeyboardHook = new ServerKeyboardHook();
         private ServerMouseHook serverMouseHook = new ServerMouseHook();
 
-        public Form1()
+        public FormServer()
         {
             InitializeComponent();
             status = ServerStatus.Off;

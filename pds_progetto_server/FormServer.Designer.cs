@@ -1,6 +1,6 @@
 ﻿namespace pds_progetto_server
 {
-    partial class Form1
+    partial class FormServer
     {
         /// <summary>
         /// Variabile di progettazione necessaria.

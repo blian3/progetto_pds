@@ -1,6 +1,6 @@
 ﻿namespace pds_progetto
 {
-    partial class Form1
+    partial class FormClient
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
