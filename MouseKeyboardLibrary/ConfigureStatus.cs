@@ -8,13 +8,17 @@ using System.Windows.Forms;
 namespace MouseKeyboardLibrary
 {
     [Serializable]
-    public class LockedKeysStatus
+    public class ConfigureStatus
     {
         public bool CapsLocked, NumLocked;
-        public LockedKeysStatus()
+        public bool SendClip, RecClip;
+
+        public ConfigureStatus(bool send, bool rec)
         {
             CapsLocked = Control.IsKeyLocked(Keys.CapsLock);
             NumLocked = Control.IsKeyLocked(Keys.NumLock);
+            SendClip = send;
+            RecClip = rec;
         }
     }
 }

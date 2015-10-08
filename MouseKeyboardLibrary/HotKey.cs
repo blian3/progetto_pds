@@ -11,6 +11,7 @@ namespace MouseKeyboardLibrary
 
     #region HotKey
 
+    [Serializable]
     public class HotKey
     {
         private List<Keys> sequence;
@@ -54,7 +55,10 @@ namespace MouseKeyboardLibrary
             string s = "";
             foreach (Keys k in sequence)
                 s += (ConvertToString(k) + " + ");
-            asString = s.Substring(0, s.Length - 3);
+            if (s.Equals(""))
+                asString = "";
+            else
+                asString = s.Substring(0, s.Length - 3);
         }
 
         private string ConvertToString(Keys k)
@@ -168,7 +172,7 @@ namespace MouseKeyboardLibrary
         }
 
         public bool HasSameKeysSequence(HotKey hk)
-        {
+        {   
             int minSize = Size() < hk.Size() ? Size() : hk.Size();
             for (int i = 0; i < minSize; ++i)
                 if (sequence[i] != hk.sequence[i])

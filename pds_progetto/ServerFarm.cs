@@ -26,11 +26,13 @@ namespace pds_progetto
 
         public void updateServer(Server s)
         {
+            //Il nome non cambia.
             server_list[s.Name].updateServer(s);
         }
 
         public void replaceServer(String old_name, Server s)
         {
+            //Il nome viene modificato
             server_list.Add(s.Name, s);
             server_list.Remove(old_name);
         }
@@ -57,13 +59,15 @@ namespace pds_progetto
         private bool _authenticate;
         private bool _active;
 
-
+        
 
         public Server(String name, String password, HotKey hk, IPAddress ip, int port)
         {
             _name = name;
             _password = password;
-            _hotKey = hk;
+            if (hk == null)
+                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH ERRORE");
+            _hotKey = hk; 
             _ip = ip;
             _port = port;
         }

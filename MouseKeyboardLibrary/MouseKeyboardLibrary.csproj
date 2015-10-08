@@ -59,7 +59,7 @@
     <Compile Include="Exceptions.cs" />
     <Compile Include="GlobalHook.cs" />
     <Compile Include="HotKey.cs" />
-    <Compile Include="LockedKeysStatus.cs" />
+    <Compile Include="ConfigureStatus.cs" />
     <Compile Include="ServerKeyboardHook.cs" />
     <Compile Include="ClientKeyboardHook.cs" />
     <Compile Include="KeyboardSimulator.cs" />

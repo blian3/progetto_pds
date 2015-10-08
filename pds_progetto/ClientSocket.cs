@@ -97,14 +97,14 @@ public class ClientSocket
         }
     }
 
-    public void SendLockedKeysStatus()
+    public void SendConfigueStatus(bool send, bool rec)
     {
         if (!connected) return;
         try
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                bf.Serialize(ms, new LockedKeysStatus());
+                bf.Serialize(ms, new ConfigureStatus(send, rec));
                 byte[] data = ms.ToArray();
                 socket.Send(BitConverter.GetBytes(data.Length));
                 socket.Send(data);

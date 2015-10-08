@@ -50,19 +50,22 @@
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.btnStop = new System.Windows.Forms.Button();
-            this.btnStart = new System.Windows.Forms.Button();
             this.label_EXIT_HotKey = new System.Windows.Forms.Label();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.checkBoxInvia = new System.Windows.Forms.CheckBox();
+            this.checkBoxRicevi = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnConnetti
             // 
-            this.btnConnetti.Location = new System.Drawing.Point(18, 62);
+            this.btnConnetti.Location = new System.Drawing.Point(16, 30);
             this.btnConnetti.Margin = new System.Windows.Forms.Padding(2);
             this.btnConnetti.Name = "btnConnetti";
             this.btnConnetti.Size = new System.Drawing.Size(77, 23);
@@ -74,7 +77,7 @@
             // btnAttiva
             // 
             this.btnAttiva.Enabled = false;
-            this.btnAttiva.Location = new System.Drawing.Point(18, 28);
+            this.btnAttiva.Location = new System.Drawing.Point(16, 67);
             this.btnAttiva.Margin = new System.Windows.Forms.Padding(2);
             this.btnAttiva.Name = "btnAttiva";
             this.btnAttiva.Size = new System.Drawing.Size(77, 23);
@@ -218,7 +221,8 @@
             this.txtHotKey.Size = new System.Drawing.Size(125, 20);
             this.txtHotKey.TabIndex = 5;
             this.txtHotKey.TextChanged += new System.EventHandler(this.textBoxHotKey_TextChanged);
-            this.txtHotKey.Enter += new System.EventHandler(this.textBoxDetails_EnterFocus);
+            this.txtHotKey.Enter += new System.EventHandler(this.textBoxHotKey_EnterFocus);
+            this.txtHotKey.Leave += new System.EventHandler(this.textBoxHotKey_LeaveFocus);
             // 
             // txtPortNumber
             // 
@@ -299,10 +303,10 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.groupBox2);
             this.groupBox5.Controls.Add(this.btnConnetti);
             this.groupBox5.Controls.Add(this.btnStop);
             this.groupBox5.Controls.Add(this.btnAttiva);
-            this.groupBox5.Controls.Add(this.btnStart);
             this.groupBox5.Location = new System.Drawing.Point(455, 28);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(110, 238);
@@ -312,7 +316,7 @@
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(18, 187);
+            this.btnStop.Location = new System.Drawing.Point(18, 203);
             this.btnStop.Margin = new System.Windows.Forms.Padding(2);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(66, 20);
@@ -320,17 +324,6 @@
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click_1);
-            // 
-            // btnStart
-            // 
-            this.btnStart.Location = new System.Drawing.Point(18, 152);
-            this.btnStart.Margin = new System.Windows.Forms.Padding(2);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(66, 20);
-            this.btnStart.TabIndex = 8;
-            this.btnStart.Text = "Start";
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click_1);
             // 
             // label_EXIT_HotKey
             // 
@@ -356,7 +349,38 @@
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.contextMenuStrip1_Click);
             // 
-            // Form1
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.checkBoxRicevi);
+            this.groupBox2.Controls.Add(this.checkBoxInvia);
+            this.groupBox2.Location = new System.Drawing.Point(9, 99);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(95, 67);
+            this.groupBox2.TabIndex = 10;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Clipboard";
+            // 
+            // checkBoxInvia
+            // 
+            this.checkBoxInvia.AutoSize = true;
+            this.checkBoxInvia.Location = new System.Drawing.Point(7, 19);
+            this.checkBoxInvia.Name = "checkBoxInvia";
+            this.checkBoxInvia.Size = new System.Drawing.Size(49, 17);
+            this.checkBoxInvia.TabIndex = 0;
+            this.checkBoxInvia.Text = "Invia";
+            this.checkBoxInvia.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxRicevi
+            // 
+            this.checkBoxRicevi.AutoSize = true;
+            this.checkBoxRicevi.Location = new System.Drawing.Point(7, 43);
+            this.checkBoxRicevi.Name = "checkBoxRicevi";
+            this.checkBoxRicevi.Size = new System.Drawing.Size(56, 17);
+            this.checkBoxRicevi.TabIndex = 1;
+            this.checkBoxRicevi.Text = "Ricevi";
+            this.checkBoxRicevi.UseVisualStyleBackColor = true;
+            // 
+            // FormClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -366,7 +390,7 @@
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "Form1";
+            this.Name = "FormClient";
             this.Text = "Client";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
@@ -374,6 +398,8 @@
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -402,10 +428,12 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button btnStop;
-        private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Label label_EXIT_HotKey;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.CheckBox checkBoxRicevi;
+        private System.Windows.Forms.CheckBox checkBoxInvia;
     }
 }
 
